@@ -6,4 +6,6 @@
 .quarto
 input/*
 output/*
+!input/.gitkeep
+!output/.gitkeep
 DB_Connection.txt
