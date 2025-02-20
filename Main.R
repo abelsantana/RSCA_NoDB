@@ -3,6 +3,9 @@ library(tidyverse)
 library(lubridate)
 library(dplyr)
 library(openxlsx)
+library(DBI) 
+library(RPostgreSQL) 
+
 
 ###  You need to run 0.1_Data_Prepping.R and the database connection string (con) before you run this script
 ###  Only once per session just to generate the data that 0.2_RSCA_Core needs
@@ -17,10 +20,10 @@ Type <- NA
 graph_mode <- "primary"  
 
 # Define Output Directory for Processed Data
-output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output"
+output_base_dir <- "~/My_R/RSCA_NoDB/output"
 
 # Load test site data
-import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/PSA_RSCA_SitesTEST.csv")
+import_sites <- read.csv("~/My_R/RSCA_NoDB/input/PSA_RSCA_SitesTEST.csv")
 
 # If 'channel_engineering_class' exists and Type is specified, filter test sites
 if ("channel_engineering_class" %in% colnames(import_sites) && !is.na(Type)) {
