@@ -6,3 +6,4 @@
 .quarto
 input/*
 output/*
+DB_Connection.txt
