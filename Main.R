@@ -7,8 +7,10 @@ library(DBI)
 library(RPostgreSQL) 
 
 
-###  You need to run 0.1_Data_Prepping.R and the database connection string (con) before you run this script
-###  Only once per session just to generate the data that 0.2_RSCA_Core needs
+###  You need to run the database connection string (con) before you source 0.1_Data_Prepping and run this script
+###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
+source('R/0.1_Data_Prepping.R')
+###
 
 # Define Channel Engineering Type 
 # Change this to "HB", "SB1" etc. to filter specific test sites 
