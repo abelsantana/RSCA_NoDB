@@ -57,7 +57,7 @@ scape <- scape %>%
   
   # If no data, don't run RSCA analysis
   if (CSCI_check_fun_out$csci_check[[1]] == "no"){
-    
+    message("No CSCI data for TestID: ", TestID)
     print(CSCI_check_fun_out)
     
     # Else run RSCA analysis

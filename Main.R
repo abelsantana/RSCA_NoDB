@@ -11,6 +11,8 @@ library(RPostgreSQL)
 ###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
 source('R/0.1_Data_Prepping.R')
 ###
+# Load the base data, ensuring csci_base_df is available
+load("Base_Files/Base_Data.RData")
 
 # Define Channel Engineering Type 
 # Change this to "HB", "SB1" etc. to filter specific test sites 
@@ -22,10 +24,10 @@ Type <- NA
 graph_mode <- "none"  
 
 # Define Output Directory for Processed Data
-output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output/modChannels"
+output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output"
 
 # Load test site data
-import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/sites_in_socal_with_class_02052025.csv")
+import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv")
 
 # Check to see if the input sites are modified channels
 # If they are filter the NA values out and then filter by Type set above
@@ -35,11 +37,33 @@ if ("channel_engineering_class" %in% colnames(import_sites)) {
     { if (!is.na(Type)) filter(., channel_engineering_class == Type) else . }
 }
 
-# Get the list of test sites after filtering
-my_input_sites <- import_sites$masterid
+# Check if the sites are in the csci database
+# Get the unique masterids from the csci df 
+csci_stations <- unique(csci_base_df$masterid)
+
+# Identify which sites have CSCI data
+has_csci <- import_sites$masterid %in% csci_stations
+
+# Split the data into 2 sets depending if csci data is available 
+sites_valid_csci <- import_sites[has_csci, ]
+sites_missing_csci <- import_sites[!has_csci, ]
+
+# Write missing sites to CSV if any exist
+if(nrow(sites_missing_csci) > 0) {
+  write.csv(sites_missing_csci, 
+            file = file.path(output_base_dir, "Sites_No_CSCI_Data.csv"), 
+            row.names = FALSE)
+  message("The list of sites with no CSCI data has been saved to: ", 
+          file.path(output_base_dir, "Sites_No_CSCI_Data.csv"))
+} else {
+  message("All import sites have corresponding CSCI data.")
+}
+
+# Use the valid sites for processing
+my_input_sites <- sites_valid_csci$masterid
 
 # Define chunk size and split into chunks
-chunk_size <- 25
+chunk_size <- 20
 site_chunks <- split(my_input_sites, ceiling(seq_along(my_input_sites) / chunk_size))
 
 ### If the process gets interrupted, you can restart from a specific chunk.
@@ -48,7 +72,7 @@ site_chunks <- split(my_input_sites, ceiling(seq_along(my_input_sites) / chunk_s
 # chunk_start <- 3  
 # for (chunk_idx in seq(chunk_start, length(site_chunks))) {
 
-# Process each chunk of 25 sites
+# Process each chunk of sites
 for (chunk_idx in seq_along(site_chunks)) { 
   # Define the subset of sites for the current chunk
   my_input_test_sites <- site_chunks[[chunk_idx]]
