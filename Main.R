@@ -19,17 +19,20 @@ Type <- NA
 
 # User-defined switch for graph generation
 # Options: "none", "primary", "secondary", "both"
-graph_mode <- "primary"  
+graph_mode <- "none"  
 
 # Define Output Directory for Processed Data
-output_base_dir <- "~/My_R/RSCA_NoDB/output"
+output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output/modChannels"
 
 # Load test site data
-import_sites <- read.csv("~/My_R/RSCA_NoDB/input/PSA_RSCA_SitesTEST.csv")
+import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/sites_in_socal_with_class_02052025.csv")
 
-# If 'channel_engineering_class' exists and Type is specified, filter test sites
-if ("channel_engineering_class" %in% colnames(import_sites) && !is.na(Type)) {
-  import_sites <- import_sites %>% filter(channel_engineering_class == Type)
+# Check to see if the input sites are modified channels
+# If they are filter the NA values out and then filter by Type set above
+if ("channel_engineering_class" %in% colnames(import_sites)) {
+  import_sites <- import_sites %>%
+    filter(!is.na(channel_engineering_class)) %>%
+    { if (!is.na(Type)) filter(., channel_engineering_class == Type) else . }
 }
 
 # Get the list of test sites after filtering
