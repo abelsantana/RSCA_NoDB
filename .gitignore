@@ -10,3 +10,4 @@ output/*
 !output/.gitkeep
 DB_Connection.txt
 R/config.R
+R/troubleshooting.R
