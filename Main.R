@@ -10,6 +10,9 @@ library(RPostgreSQL)
 ###  You need to run the database connection string (con) before you source 0.1_Data_Prepping and run this script
 ###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
 source('R/0.1_Data_Prepping.R')
+print('Data Prep')
+prep_smc_data(con)
+print('Data Prep routine finished')
 ###
 # Load the base data, ensuring csci_base_df is available
 load("Base_Files/Base_Data.RData")
