@@ -66,8 +66,7 @@ prep_smc_data <- function(con) {
   #### Channel Engineering Information
   chansum_sql <- paste0("SELECT  masterid, channel_engineering_class  FROM sde.unified_channelengineering_summary")
   # pull data, writing to tibble
-  #chansum_df <- tbl(con, sql(chansum_sql)) %>%
-  chansum_df <- read.csv("~/Documents/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv") %>%
+  chansum_df <- tbl(con, sql(chansum_sql)) %>%
     as_tibble() %>% 
     # just in case, make sure no NA masterids
     filter(!is.na(masterid)) %>% 
