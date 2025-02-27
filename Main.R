@@ -242,3 +242,73 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
   gc()  # Perform garbage collection to release memory
   print(paste("Memory cleared after processing chunk", chunk_idx))
 }
+
+##### Merge all the CSVs if merging is enabled #####
+
+# Merge all of the output CSVs in one file for Monitoring Recommendations
+# and new merged CSVs for each sheet in Summary Site Data 
+if(merge_csvs) {
+  print("Starting to merge CSV files...")
+  
+  summary_sheet_names <- c(
+    "Module Summary",
+    "LOA Summary",
+    "Reference Condition Comparison",
+    "Spatial Co-Occurrence Summary",
+    "RSCA Comparator Site Data"
+  )
+  
+  # Create lists to store data for merging
+  merged_summary_data <- setNames(vector("list", length(summary_sheet_names)), summary_sheet_names)
+  monitoring_list <- list()
+  
+  # Find all files in the output folder
+  files <- list.files(output_base_dir, pattern = "\\.xlsx$", recursive = TRUE, full.names = TRUE)
+  
+  # Process each file
+  for(file in files) {
+    tryCatch({
+      if (str_detect(file, "Monitoring_Recommendations")) {
+        # Process MR files
+        df <- read_excel(file)
+        monitoring_list[[length(monitoring_list) + 1]] <- df
+        
+      } else if (str_detect(file, "Summary_Site_Data")) {
+        # Process SSD - read all sheets
+        available_sheets <- excel_sheets(file)
+        
+        for(sheet in available_sheets) {
+          df <- read_excel(file, sheet = sheet)
+          merged_summary_data[[sheet]] <- c(merged_summary_data[[sheet]], list(df))
+        }
+      }
+    }, error = function(e) {
+      message(sprintf("Error reading %s: %s", file, e$message))
+    })
+  }
+  
+  # Save the MR data as CSV
+  if (length(monitoring_list) > 0) {
+    merged_monitoring <- bind_rows(monitoring_list)
+    output_monitoring <- file.path(output_base_dir, "Merged_Monitoring_Recommendations.csv")
+    write.csv(merged_monitoring, output_monitoring, row.names = FALSE)
+    message(sprintf("Merged Monitoring CSV saved to: %s", output_monitoring))
+  } else {
+    message("No Monitoring Recommendation files found")
+  }
+  
+  # Save the SSD to CSV
+  for(sheet in names(merged_summary_data)) {
+    df_list <- merged_summary_data[[sheet]]
+    if (length(df_list) > 0) {
+      merged_df <- bind_rows(df_list)
+      output_csv <- file.path(output_base_dir, paste0("Merged_", str_replace_all(sheet, " ", "_"), ".csv"))
+      write.csv(merged_df, output_csv, row.names = FALSE)
+      message(sprintf("Merged CSV saved for '%s': '%s'", sheet, output_csv))
+    } else {
+      message(sprintf("No data found for '%s'", sheet))
+    }
+  }
+  
+  print("CSV merging process completed.")
+} 
