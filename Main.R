@@ -24,7 +24,6 @@ Type <- NA
 # Options: "none", "primary", "secondary", "both"
 graph_mode <- "both"  
 
-<<<<<<< HEAD
 # Toggle for CSV merging at the end (TRUE/FALSE)
 merge_csvs <- TRUE  
 
@@ -39,13 +38,12 @@ import_sites <- read.csv("~/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025
 output_base_dir <- "~/MyR/RSCA_NoDB/output"
 
 ##### Check the import_sites  #####
-=======
+
 # Define Output Directory for Processed Data
 output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output/PSA"
 
 # Load test site data
 import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/PSA_RSCA_SitesTEST.csv")
->>>>>>> 246f1ee (cleaned up plumber.R, plots.R)
 
 # Check to see if the input sites are modified channels
 # If they are filter the NA values out and then filter by Type set above
@@ -212,31 +210,6 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
   }
 
   # Secondary Graphing Functions
-<<<<<<< HEAD
-  if (graph_mode %in% c("secondary", "both")) {
-    print(paste("Starting Secondary graphing"))
-    source('R/plumber.R')  
-    secondary_graphs_dir <- file.path(output_dir, "secondary_graphs")
-    if (!dir.exists(secondary_graphs_dir)) {
-      dir.create(secondary_graphs_dir, recursive = TRUE, showWarnings = FALSE)
-    }
-    tryCatch({
-      for (sample in unique(LOE_sum_df$test_csci_sampleid[LOE_sum_df$test_site == i])) {
-        for (mod in unique(LOE_sum_df$module[LOE_sum_df$test_site == i])) {
-          for (analysis in unique(LOE_sum_df$loe[LOE_sum_df$test_site == i])) {
-            last_plots(my_site = i, sampleid = sample, module = mod, loa = analysis)
-          }
-        }
-      }
-      print(paste("Secondary graphing completed"))
-    }, error = function(e) {
-      print(paste("Error in Secondary graphing", e$message))
-    })
-  }
-
-##### Clean up ##### 
-   
-=======
    if (graph_mode %in% c("secondary", "both")) {
      print(paste("Starting Secondary graphing"))
      tryCatch({
@@ -246,8 +219,9 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
        print(paste("Error in Secondary graphing:", e$message))
      })
    }   
-  
->>>>>>> 246f1ee (cleaned up plumber.R, plots.R)
+   
+##### Clean up ##### 
+   
   # Clear data frames to free up memory after each chunk
   data_frames_to_remove <- c(
     "scape", "my_input_test_sites", "CORE_fun_out", "Test_Comp_df", 
