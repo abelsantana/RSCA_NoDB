@@ -31,19 +31,13 @@ merge_csvs <- TRUE
 # If the process gets interrupted, you can restart from a specific chunk.
 chunk_start <- 1
 
-# Load test site data
-import_sites <- read.csv("~/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv")
-
-# Set output directory for processed data
-output_base_dir <- "~/MyR/RSCA_NoDB/output"
-
-##### Check the import_sites  #####
-
 # Define Output Directory for Processed Data
 output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output/PSA"
 
 # Load test site data
 import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/PSA_RSCA_SitesTEST.csv")
+
+##### Check the import_sites  #####
 
 # Check to see if the input sites are modified channels
 # If they are filter the NA values out and then filter by Type set above
