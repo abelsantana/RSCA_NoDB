@@ -1,11 +1,9 @@
-library(jsonlite)
-library(tidyverse)
-library(lubridate)
-library(dplyr)
-library(openxlsx)
-library(DBI) 
-library(RPostgreSQL) 
 
+library(tidyverse)
+library(openxlsx)
+library(readxl)
+library(DBI) 
+library(RPostgreSQL)
 
 ###  You need to run the database connection string (con) before you source 0.1_Data_Prepping and run this script
 ###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
@@ -14,8 +12,8 @@ print('Data Prep')
 prep_smc_data(con)
 print('Data Prep routine finished')
 ###
-# Load the base data, ensuring csci_base_df is available
-load("Base_Files/Base_Data.RData")
+
+######  User defined variables  ######
 
 # Define Channel Engineering Type 
 # Change this to "HB", "SB1" etc. to filter specific test sites 
@@ -26,11 +24,20 @@ Type <- NA
 # Options: "none", "primary", "secondary", "both"
 graph_mode <- "none"  
 
-# Define Output Directory for Processed Data
-output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output"
+# Toggle for CSV merging at the end (TRUE/FALSE)
+merge_csvs <- TRUE  
+
+# What chunk to start processing the data. Default is 1
+# If the process gets interrupted, you can restart from a specific chunk.
+chunk_start <- 1
 
 # Load test site data
-import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv")
+import_sites <- read.csv("~/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv")
+
+# Set output directory for processed data
+output_base_dir <- "~/MyR/RSCA_NoDB/output"
+
+##### Check the import_sites  #####
 
 # Check to see if the input sites are modified channels
 # If they are filter the NA values out and then filter by Type set above
@@ -39,6 +46,9 @@ if ("channel_engineering_class" %in% colnames(import_sites)) {
     filter(!is.na(channel_engineering_class)) %>%
     { if (!is.na(Type)) filter(., channel_engineering_class == Type) else . }
 }
+
+# Load the base data, ensuring csci_base_df is available
+load("Base_Files/Base_Data.RData")
 
 # Check if the sites are in the csci database
 # Get the unique masterids from the csci df 
@@ -65,18 +75,13 @@ if(nrow(sites_missing_csci) > 0) {
 # Use the valid sites for processing
 my_input_sites <- sites_valid_csci$masterid
 
+##### Chunk up the import sites and start processing #####
+
 # Define chunk size and split into chunks
 chunk_size <- 20
 site_chunks <- split(my_input_sites, ceiling(seq_along(my_input_sites) / chunk_size))
-
-### If the process gets interrupted, you can restart from a specific chunk.
-## Uncomment and set `chunk_start` to resume from that chunk index.
-# Example: Start from chunk 3
-# chunk_start <- 3  
-# for (chunk_idx in seq(chunk_start, length(site_chunks))) {
-
-# Process each chunk of sites
-for (chunk_idx in seq_along(site_chunks)) { 
+ 
+for (chunk_idx in seq(chunk_start, length(site_chunks))) {
   # Define the subset of sites for the current chunk
   my_input_test_sites <- site_chunks[[chunk_idx]]
   print(paste("Processing chunk", chunk_idx, "of", length(site_chunks), "of", length(my_input_sites), "total sites."))
@@ -183,6 +188,8 @@ for (chunk_idx in seq_along(site_chunks)) {
     print(paste("Monitoring recommendations created for site:", i))
   }
   
+##### Graph the data if needed #####
+   
   # Primary Graphing Functions
   if (graph_mode %in% c("primary", "both")) {
     print(paste("Starting Primary graphing"))
@@ -217,7 +224,9 @@ for (chunk_idx in seq_along(site_chunks)) {
       print(paste("Error in Secondary graphing", e$message))
     })
   }
- 
+
+##### Clean up ##### 
+   
   # Clear data frames to free up memory after each chunk
   data_frames_to_remove <- c(
     "scape", "my_input_test_sites", "CORE_fun_out", "Test_Comp_df", 
