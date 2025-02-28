@@ -7,10 +7,10 @@ library(RPostgreSQL)
 
 ###  You need to run the database connection string (con) before you source 0.1_Data_Prepping and run this script
 ###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
-source('R/0.1_Data_Prepping.R')
-print('Data Prep')
-prep_smc_data(con)
-print('Data Prep routine finished')
+# source('R/0.1_Data_Prepping.R')
+# print('Data Prep')
+# prep_smc_data(con)
+# print('Data Prep routine finished')
 ###
 
 ######  User defined variables  ######
@@ -25,17 +25,17 @@ Type <- NA
 graph_mode <- "both"  
 
 # Toggle for CSV merging at the end (TRUE/FALSE)
-merge_csvs <- TRUE  
+merge_csvs <- FALSE  
 
 # What chunk to start processing the data. Default is 1
 # If the process gets interrupted, you can restart from a specific chunk.
-chunk_start <- 1
+#chunk_start <- 1
 
 # Define Output Directory for Processed Data
 output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output/PSA"
 
 # Load test site data
-import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/PSA_RSCA_SitesTEST.csv")
+import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/PSA_RSCA_Sites.csv")
 
 ##### Check the import_sites  #####
 
@@ -80,11 +80,16 @@ my_input_sites <- sites_valid_csci$masterid
 # Define chunk size and split into chunks
 chunk_size <- 20
 site_chunks <- split(my_input_sites, ceiling(seq_along(my_input_sites) / chunk_size))
- 
-for (chunk_idx in seq(chunk_start, length(site_chunks))) {
+
+for (chunk_idx in seq_along(site_chunks)) { 
   # Define the subset of sites for the current chunk
   my_input_test_sites <- site_chunks[[chunk_idx]]
   print(paste("Processing chunk", chunk_idx, "of", length(site_chunks), "of", length(my_input_sites), "total sites."))
+ 
+# for (chunk_idx in seq(chunk_start, length(site_chunks))) {
+#   # Define the subset of sites for the current chunk
+#   my_input_test_sites <- site_chunks[[chunk_idx]]
+#   print(paste("Processing chunk", chunk_idx, "of", length(site_chunks), "of", length(my_input_sites), "total sites."))
   
   # Load the main script to build all the tables
   source('R/0.2_RSCA_Core.R')
@@ -227,12 +232,12 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
     "loa_summary.i", "ref_con_comp.i", "stress_resp_sum.i", "spatial_co_sum.i", 
     "comp_site_data2.i", "monitoring_recs.i", "list_of_sheets"
   )
-  #rm(list = data_frames_to_remove)
+  rm(list = data_frames_to_remove)
   gc()  # Perform garbage collection to release memory
   print(paste("Memory cleared after processing chunk", chunk_idx))
 }
 
-##### Merge all the CSVs if merging is enabled #####
+# Merge all the CSVs if merging is enabled 
 
 # Merge all of the output CSVs in one file for Monitoring Recommendations
 # and new merged CSVs for each sheet in Summary Site Data 
