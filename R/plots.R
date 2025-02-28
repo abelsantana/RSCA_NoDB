@@ -14,30 +14,40 @@ LOE_palette <- c("Supporting" = "#E31A1C", "Weakening"="#1F78B4", "Indeterminate
 # SR_LOE_df
 spatial.co.plot <- function(sco_dat, sco_loe, sampleid, mod){
   # assigning colors based on final SR categories: Supporting, Weakening, No Test Data, Indeterminate, CSCI > 0.79
-  
-  ggplot(
-    data = sco_dat,
-    mapping = aes(y = comp_result))+
-    geom_boxplot(width = 0.2)+
-    geom_hline(data = sco_loe, 
-               aes(yintercept = test_result, color = sco_score),        ## colored = test_result and the color of the line is based on "score" 
-               key_glyph = draw_key_label, size = 1, linetype = 2)+ 
-    scale_color_manual(values = LOE_palette, limits = names(LOE_palette))+
-    facet_wrap(~analytename, scales = "free")+
-    labs(y = "Result")+
-    labs(color = "Spatial Co-Occurence Score")+
-    theme_bw()+
+  # Ensure all LOE_palette levels
+  sco_loe$sco_score <- factor(
+    sco_loe$sco_score,
+    levels = names(LOE_palette)
+  )
+  ggplot(data = sco_dat, mapping = aes(y = comp_result)) +
+    geom_boxplot(width = 0.2) +
+    geom_hline(
+      data = sco_loe, 
+      aes(yintercept = test_result, color = sco_score),        
+      key_glyph = draw_key_rect,  # Added this line for a rectangle key
+      size = 1, linetype = 2
+    ) +
+    scale_color_manual(
+      values = LOE_palette, 
+      limits = names(LOE_palette), 
+      drop = FALSE,
+      guide = guide_legend(override.aes = list(linetype = 0, shape = 15))
+    ) +
+    facet_wrap(~analytename, scales = "free") +
+    labs(y = "Result") +
+    labs(color = "Spatial Co-Occurence Score") +
+    theme_bw() +
     guides(
       shape = guide_legend(override.aes = list(size = 3)),
       color = guide_legend(override.aes = list(size = 3))
     ) +
     theme(
       panel.grid = element_blank(),
-      axis.text.x=element_blank(),
-      axis.ticks.x=element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
       legend.position = "right",
-      legend.title = element_text(size=7),
-      legend.text = element_text(size=5)
+      legend.title = element_text(size = 7),
+      legend.text = element_text(size = 5)
     )
 }
 
@@ -48,6 +58,13 @@ spatial.co.plot <- function(sco_dat, sco_loe, sampleid, mod){
 # RCC_LOE_df
 
 ref.cond.plot <- function(rcc_dat, rcc_loe, sampleid, mod) {
+  
+  # Ensure all LOE_palette levels
+  rcc_loe$rcc_score <- factor(
+    rcc_loe$rcc_score,
+    levels = names(LOE_palette)
+  )
+  
   ggplot(
     data = rcc_dat,
     mapping = aes(y = comp_result)
@@ -55,8 +72,13 @@ ref.cond.plot <- function(rcc_dat, rcc_loe, sampleid, mod) {
     geom_boxplot(width = 0.2)+
     geom_hline(data = rcc_loe, 
                aes(yintercept = test_result, color = rcc_score), 
-               key_glyph = draw_key_label, size = 1, linetype = 2) +
-    scale_color_manual(values = LOE_palette, limits = names(LOE_palette)) +
+               key_glyph = draw_key_rect, size = 1, linetype = 2) +
+    scale_color_manual(
+      values = LOE_palette, 
+      limits = names(LOE_palette), 
+      drop = FALSE,
+      guide = guide_legend(override.aes = list(linetype = 0, shape = 15))
+    ) +
     facet_wrap(~analytename, scales = "free") +
     labs(y = "Result") +
     labs(color = "Reference Condition Score")+
@@ -81,16 +103,27 @@ ref.cond.plot <- function(rcc_dat, rcc_loe, sampleid, mod) {
 
 # SR_log_LOE_df
 stress.resp.plot <- function(sr_log_dat, sr_log_loe, sampleid, mod){
+  
+  # Ensure rcc_score has all LOE_palette levels
+  sr_log_loe$sr_score <- factor(
+    sr_log_loe$sr_score,
+    levels = names(LOE_palette)
+  )
   ggplot(data = sr_log_dat, aes(x = comp_result, y = cond2_ref_y))+
     geom_smooth(formula = y ~ x, method = "glm", method.args=list(family="binomial"), se=T, level=0.8, fill="#99CCFF")+
     geom_point(shape=21, size=1.5, fill="#666666")+
     facet_wrap(~analytename, scales = "free_x", nrow = 3)+
     labs(y="Probability of Poor CSCI Score", x="Stressor Value")+
     geom_vline(data = sr_log_loe, 
-               aes(xintercept=test_result*1, color = sr_score), key_glyph = draw_key_label, linetype=2)+
+               aes(xintercept=test_result*1, color = sr_score), key_glyph = draw_key_rect, linetype=2)+
     geom_hline(yintercept = 0.6, color="#8c8c8c", linetype=1)+
     geom_hline(yintercept=0.4, color="#8c8c8c", linetype=1)+
-    scale_color_manual(values = LOE_palette, limits = names(LOE_palette))+
+    scale_color_manual(
+      values = LOE_palette,
+      limits = names(LOE_palette),
+      drop = FALSE,
+      guide = guide_legend(override.aes = list(linetype = 0, shape = 15))
+      )+
     scale_y_continuous(limits = c(0,1), breaks=c(0, 0.5, 1))+
     labs(color = "Stressor Response Score")+
     theme_bw()+
