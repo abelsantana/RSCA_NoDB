@@ -51,11 +51,11 @@ site_csci_module_plotter <- function(my_site, output_dir) {
     # graphing 10th and 90th percentile range SCAPE predictions
     geom_rect(aes(ymin = qt10, ymax = qt90, xmin = -Inf, xmax = Inf), fill = 'grey92')+
     # adding reference line, qt50
-    geom_hline(yintercept = csci_module_data$qt50[1], linetype = "dashed", size = 1, color = 'grey', alpha = 0.8)+
+    geom_hline(yintercept = csci_module_data$qt50[1], linetype = "dashed", size = 1, color = 'grey', alpha = 0.8, show.legend = TRUE)+
     # add slightly larger points behind, so get black outlines
     geom_point(aes(shape = Performance, fill = Performance), size = 4, color = "transparent")+  # changed from 5 to 4 
     # # adding reference line, CSCI = 0.79
-    geom_hline(yintercept = 0.79, linetype = "dashed", size = 0.5)+
+    geom_hline(yintercept = 0.79, linetype = "dashed", size = 0.5, show.legend = TRUE)+
     
     # setting Expected data range, will change if add new data
     # date range is geneally 2000-2019
@@ -100,7 +100,7 @@ site_csci_module_plotter <- function(my_site, output_dir) {
   # plotting module summaries over time for each site
   site_module_plot <-ggplot(data = csci_module_data_2,
                             aes(x = year, y = Module))+
-    geom_tile(aes(fill = Result), color = 'white', width = 0.8, height = 0.8)+
+    geom_tile(aes(fill = Result), color = 'white', width = 0.8, height = 0.8, show.legend = TRUE)+
     # setting expected data range, will change if add new data
     # date range
     scale_x_discrete(limits = c(2000:2025))+
@@ -125,7 +125,7 @@ site_csci_module_plotter <- function(my_site, output_dir) {
   # Save plot in the correct folder
   ggsave(
     file = file.path(output_dir, paste0("1.0_Module_Summary_", my_site, ".jpeg")),
-    plot = site_csci_plot,
+    plot = combined_plot,
     width = 14, height = 9, units = "in"
   )
 }
@@ -180,16 +180,16 @@ site_loe_plotter <- function(my_site, output_dir) {
     # retain module of interest
     module_data <- loe_module_data %>% 
       filter(Module == my_module)
-    
+
     # plot lines of evidence results over time
     ggplot(data = module_data,
            aes(x = year, y = LOE))+
-      geom_tile(aes(fill = Score), color = 'white', width = 0.8, height = 0.8)+
+      geom_tile(aes(fill = Score), color = 'white', width = 0.8, height = 0.8, show.legend = TRUE)+
       # setting expected data range, will change if add new data
       scale_x_discrete(limits = c(2000:2025))+
       expand_limits(x = c(2000, 2025))+
       # using colorblind friendly palette instead, with matched module results set above in cbPalette
-      scale_fill_manual(values = cbPalette_v2, limits = names(cbPalette_v2))+
+      scale_fill_manual(values = cbPalette_v2, limits = names(cbPalette_v2), drop = FALSE)+
       # scale_fill_brewer(palette = "Pastel1")+
       xlab("Year")+
       ylab("Line of Analysis")+

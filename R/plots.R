@@ -25,7 +25,8 @@ spatial.co.plot <- function(sco_dat, sco_loe, sampleid, mod){
       data = sco_loe, 
       aes(yintercept = test_result, color = sco_score),        
       key_glyph = draw_key_rect,  # Added this line for a rectangle key
-      size = 1, linetype = 2
+      size = 1, linetype = 2,
+      show.legend = TRUE
     ) +
     scale_color_manual(
       values = LOE_palette, 
@@ -72,7 +73,8 @@ ref.cond.plot <- function(rcc_dat, rcc_loe, sampleid, mod) {
     geom_boxplot(width = 0.2)+
     geom_hline(data = rcc_loe, 
                aes(yintercept = test_result, color = rcc_score), 
-               key_glyph = draw_key_rect, size = 1, linetype = 2) +
+               key_glyph = draw_key_rect, size = 1, linetype = 2,
+               show.legend = TRUE) +
     scale_color_manual(
       values = LOE_palette, 
       limits = names(LOE_palette), 
@@ -115,7 +117,7 @@ stress.resp.plot <- function(sr_log_dat, sr_log_loe, sampleid, mod){
     facet_wrap(~analytename, scales = "free_x", nrow = 3)+
     labs(y="Probability of Poor CSCI Score", x="Stressor Value")+
     geom_vline(data = sr_log_loe, 
-               aes(xintercept=test_result*1, color = sr_score), key_glyph = draw_key_rect, linetype=2)+
+               aes(xintercept=test_result*1, color = sr_score), key_glyph = draw_key_rect, linetype=2, show.legend = TRUE)+
     geom_hline(yintercept = 0.6, color="#8c8c8c", linetype=1)+
     geom_hline(yintercept=0.4, color="#8c8c8c", linetype=1)+
     scale_color_manual(

@@ -508,7 +508,7 @@ prep_smc_data <- function(con) {
     select(masterid, sampledate, fieldreplicate, labreplicate, total_p_mgl, total_p_mgl_mdl, total_p_mgl_rl, total_p_mgl_method) %>% 
     # changed this because Phos Data is not always reported correctly in the analysis table
      #filter(total_p_mgl_method == "reported" | total_p_mgl_method == "calculated") %>% 
-    filter(total_p_mgl_method == "calculated") %>% 
+    #filter(total_p_mgl_method == "calculated") #%>% 
     rename(result = total_p_mgl, mdl = total_p_mgl_mdl, rl = total_p_mgl_rl, methodname = total_p_mgl_method) %>% 
     mutate(unit = "mg/l", analytename = "Phosphorus as P", resqualcode = "=", qacode = "None") %>% 
     select(masterid, sampledate, fieldreplicate, labreplicate, analytename, methodname, result, unit, resqualcode, mdl, rl, qacode) %>% 
