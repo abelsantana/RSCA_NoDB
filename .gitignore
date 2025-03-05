@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
+input/*
+output/*
+!input/.gitkeep
+!output/.gitkeep
+DB_Connection.txt
+R/config.R
+R/troubleshooting.R
