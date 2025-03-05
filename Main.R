@@ -7,10 +7,10 @@ library(RPostgreSQL)
 
 ###  You need to run the database connection string (con) before you source 0.1_Data_Prepping and run this script
 ###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
-# source('R/0.1_Data_Prepping.R')
-# print('Data Prep')
-# prep_smc_data(con)
-# print('Data Prep routine finished')
+source('R/0.1_Data_Prepping.R')
+print('Data Prep')
+prep_smc_data(con)
+print('Data Prep routine finished')
 ###
 
 ######  User defined variables  ######
@@ -22,20 +22,20 @@ Type <- NA
 
 # User-defined switch for graph generation
 # Options: "none", "primary", "secondary", "both"
-graph_mode <- "both"  
+graph_mode <- "none"  
 
 # Toggle for CSV merging at the end (TRUE/FALSE)
-merge_csvs <- FALSE  
+merge_csvs <- TRUE  
 
 # What chunk to start processing the data. Default is 1
 # If the process gets interrupted, you can restart from a specific chunk.
-#chunk_start <- 1
+chunk_start <- 40
 
 # Define Output Directory for Processed Data
-output_base_dir <- "~/Documents/MyR/RSCA_NoDB/output/PSA"
+output_base_dir <- "~/MyR/RSCA_NoDB/output/Cal_Mod"
 
 # Load test site data
-import_sites <- read.csv("~/Documents/MyR/RSCA_NoDB/input/PSA_RSCA_Sites.csv")
+import_sites <- read.csv("~/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv") 
 
 ##### Check the import_sites  #####
 
