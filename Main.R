@@ -81,15 +81,17 @@ my_input_sites <- sites_valid_csci$masterid
 chunk_size <- 20
 site_chunks <- split(my_input_sites, ceiling(seq_along(my_input_sites) / chunk_size))
 
-for (chunk_idx in seq_along(site_chunks)) { 
+### If the process gets interrupted, you can restart from a specific chunk.
+## Uncomment and set `chunk_start` to resume from that chunk index.
+# Example: Start from chunk 3
+# chunk_start <- 3  
+for (chunk_idx in seq(chunk_start, length(site_chunks))) {
+
+#for (chunk_idx in seq_along(site_chunks)) { 
   # Define the subset of sites for the current chunk
-  my_input_test_sites <- site_chunks[[chunk_idx]]
+#  my_input_test_sites <- site_chunks[[chunk_idx]]
   print(paste("Processing chunk", chunk_idx, "of", length(site_chunks), "of", length(my_input_sites), "total sites."))
- 
-# for (chunk_idx in seq(chunk_start, length(site_chunks))) {
-#   # Define the subset of sites for the current chunk
-#   my_input_test_sites <- site_chunks[[chunk_idx]]
-#   print(paste("Processing chunk", chunk_idx, "of", length(site_chunks), "of", length(my_input_sites), "total sites."))
+
   
   # Load the main script to build all the tables
   source('R/0.2_RSCA_Core.R')
