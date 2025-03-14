@@ -11,24 +11,24 @@
 # 1) load libraries, connect to SMC database.
 # 2) Use SQL to preform initial data queries
 #       Datasets of interest:
-#         + station information (lu_stations)
-#         + California Stream Condition Index score (analysis_csci_core)
-#         + Expected taxa and associated capture probabilities (analysis_csci_suppl1_oe)
-#         + chemistry/water quality stressor data (unified_chemistry)
-#         + Nutrient data (analysis_chem_nutrients)
-#         + Index of Physical Integrity (IPI) scores for stressor data (analysis_phab_ipi)
+#          station information (lu_stations)
+#          California Stream Condition Index score (analysis_csci_core)
+#          Expected taxa and associated capture probabilities (analysis_csci_suppl1_oe)
+#          chemistry/water quality stressor data (unified_chemistry)
+#          Nutrient data (analysis_chem_nutrients)
+#          Index of Physical Integrity (IPI) scores for stressor data (analysis_phab_ipi)
 #       Final Site Datasets:
-#         + csci
-#         + oe
-#         + stressors
-#         + stations
+#          csci
+#          oe
+#          stressors
+#          stations
 # 3) Clean each dataset individually.
 #         General steps:
-#           + retain masterid
-#           + make sure any qa/qc data like duplicates, blanks are removed (this is first done in SQL, but confirm)
-#           + all negative results to zero, all NDs to 0
-#           + remove NA results
-#           + confirm results/samples are suitable
+#            retain masterid
+#            make sure any qa/qc data like duplicates, blanks are removed (this is first done in SQL, but confirm)
+#            all negative results to zero, all NDs to 0
+#            remove NA results
+#            confirm results/samples are suitable
 # 4) Create final merged datasets, export for use in following scripts.
 
 
