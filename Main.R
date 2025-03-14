@@ -44,7 +44,7 @@ import_sites <- read.csv("~/MyR/RSCA_NoDB/input/Single_Site.csv")
 if ("channel_engineering_class" %in% colnames(import_sites)) {
   import_sites <- import_sites %>%
     filter(!is.na(channel_engineering_class)) %>%
-    { if (!is.na(Type)) filter(., channel_engineering_class == Type) else . }
+    filter (if (!is.na(Type)) channel_engineering_class == Type else TRUE)
 }
 
 # Load the base data, ensuring csci_base_df is available
