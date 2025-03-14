@@ -7,10 +7,10 @@ library(RPostgreSQL)
 
 ###  You need to run the database connection string (con) before you source 0.1_Data_Prepping and run this script
 ###  ONLY ONCE PER SESSION just to generate the data that 0.2_RSCA_Core needs
-source('R/0.1_Data_Prepping.R')
-print('Data Prep')
-prep_smc_data(con)
-print('Data Prep routine finished')
+# source('R/0.1_Data_Prepping.R')
+# print('Data Prep')
+# prep_smc_data(con)
+# print('Data Prep routine finished')
 ###
 
 ######  User defined variables  ######
@@ -22,20 +22,20 @@ Type <- NA
 
 # User-defined switch for graph generation
 # Options: "none", "primary", "secondary", "both"
-graph_mode <- "none"  
+graph_mode <- "both"  
 
 # Toggle for CSV merging at the end (TRUE/FALSE)
-merge_csvs <- TRUE  
+merge_csvs <- FALSE  
 
 # What chunk to start processing the data. Default is 1
 # If the process gets interrupted, you can restart from a specific chunk.
-chunk_start <- 40
+chunk_start <- 1
 
 # Define Output Directory for Processed Data
-output_base_dir <- "~/MyR/RSCA_NoDB/output/Cal_Mod"
+output_base_dir <- "~/MyR/RSCA_NoDB/output/SingleSites_03132025/STD"
 
 # Load test site data
-import_sites <- read.csv("~/MyR/RSCA_NoDB/input/sites_in_cal_with_class_02252025.csv") 
+import_sites <- read.csv("~/MyR/RSCA_NoDB/input/Single_Site.csv") 
 
 ##### Check the import_sites  #####
 
@@ -58,11 +58,11 @@ csci_stations <- unique(csci_base_df$masterid)
 has_csci <- import_sites$masterid %in% csci_stations
 
 # Split the data into 2 sets depending if csci data is available 
-sites_valid_csci <- import_sites[has_csci, ]
-sites_missing_csci <- import_sites[!has_csci, ]
+sites_valid_csci <- import_sites[has_csci, , drop = FALSE ]
+sites_missing_csci <- import_sites[!has_csci, , drop = FALSE ]
 
 # Write missing sites to CSV if any exist
-if(nrow(sites_missing_csci) > 0) {
+if (exists("sites_missing_csci") && is.data.frame(sites_missing_csci) && nrow(sites_missing_csci) > 0) {
   write.csv(sites_missing_csci, 
             file = file.path(output_base_dir, "Sites_No_CSCI_Data.csv"), 
             row.names = FALSE)
@@ -74,6 +74,7 @@ if(nrow(sites_missing_csci) > 0) {
 
 # Use the valid sites for processing
 my_input_sites <- sites_valid_csci$masterid
+#my_input_sites <- sites_valid_csci[, "masterid", drop = FALSE]
 
 ##### Chunk up the import sites and start processing #####
 
@@ -89,7 +90,7 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
 
 #for (chunk_idx in seq_along(site_chunks)) { 
   # Define the subset of sites for the current chunk
-#  my_input_test_sites <- site_chunks[[chunk_idx]]
+#  my_input_sites <- site_chunks[[chunk_idx]]
   print(paste("Processing chunk", chunk_idx, "of", length(site_chunks), "of", length(my_input_sites), "total sites."))
 
   
@@ -159,7 +160,7 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
    print('Generating Excel Sheets')
   
   # Generate Excel sheets for each site in the current chunk
-  for (i in my_input_test_sites) {
+  for (i in my_input_sites) {
     module_summary.i <- module_summary %>% filter(test_site == i)
     loa_summary.i <- loa_summary %>% filter(test_site == i)
     ref_con_comp.i <- ref_con_comp %>% filter(test_site == i)
@@ -193,6 +194,17 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
     monitoring_file_path <- paste0(output_dir, "/", i, "_Monitoring_Recommendations.xlsx")
     write.xlsx(monitoring_recs.i, file = monitoring_file_path)
     print(paste("Monitoring recommendations created for site:", i))
+    
+    #### LEVEL 3 Experimental - Raph asked for all these data frames as .csv for each time a site is ran
+    Level3_list <- list("SCO_dat_df", "SCO_LOE_df", "SR_log_dat_df", 
+                        "SR_log_LOE_df", "RCC_dat_df", "RCC_LOE_df") 
+    for (df_name in Level3_list) {
+      df <- get(df_name)
+      site_filtered_df <- df %>% filter(test_site == i)
+      file_path <- file.path(output_dir, paste0(i, "_", df_name, ".csv"))
+      write.csv(site_filtered_df, file = file_path, row.names = TRUE)
+    }
+    
   }
   
 ##### Graph the data if needed #####
@@ -220,12 +232,14 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
        print(paste("Error in Secondary graphing:", e$message))
      })
    }   
+ 
+     
    
 ##### Clean up ##### 
    
   # Clear data frames to free up memory after each chunk
   data_frames_to_remove <- c(
-    "scape", "my_input_test_sites", "CORE_fun_out", "Test_Comp_df", 
+    "scape", "my_input_sites", "CORE_fun_out", "Test_Comp_df", 
     "SCO_dat_df", "SCO_LOE_df", "RCC_dat_df", "RCC_LOE_df", "SR_log_dat_df", 
     "SR_log_LOE_df", "SCO_sum_df", "RCC_sum_df", "SR_log_sum_df", 
     "LOE_sum_df", "LOE_mod_sum_df", "Dat_invt_df", "monitoring_recs","monitoring_recs", 
@@ -234,7 +248,7 @@ for (chunk_idx in seq(chunk_start, length(site_chunks))) {
     "loa_summary.i", "ref_con_comp.i", "stress_resp_sum.i", "spatial_co_sum.i", 
     "comp_site_data2.i", "monitoring_recs.i", "list_of_sheets"
   )
-  rm(list = data_frames_to_remove)
+  #rm(list = data_frames_to_remove)
   gc()  # Perform garbage collection to release memory
   print(paste("Memory cleared after processing chunk", chunk_idx))
 }

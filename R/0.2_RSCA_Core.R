@@ -98,7 +98,7 @@ scape <- scape %>%
 }
 # run RSCA analysis over all input test sites
 # this generates a dataframe containing lists of results, that need to be extracted below
-CORE_fun_out <- my_input_test_sites %>% purrr::map(~CORE_fun(.x))
+CORE_fun_out <- my_input_sites %>% purrr::map(~CORE_fun(.x))
 ## for broken site !!!!!!!!!!!!!!!!
 # CORE_fun_out <- CORE_fun("801BBRC01")
 

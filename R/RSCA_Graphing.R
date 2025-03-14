@@ -130,7 +130,7 @@ site_csci_module_plotter <- function(my_site, output_dir) {
   )
 }
 
-site_csci_module_plotter_out <- purrr::map(my_input_test_sites, 
+site_csci_module_plotter_out <- purrr::map(my_input_sites, 
                                            ~site_csci_module_plotter(.x, file.path(output_base_dir, .x))
 ) ## mapping a function, applies a function across multiple different items within a list
 
@@ -213,7 +213,7 @@ site_loe_plotter <- function(my_site, output_dir) {
   ggsave(module_plotter_out[[4]], file = file.path(output_dir, paste0("1.1_Module_LOAs_Temperature_", my_site, ".jpeg")), width = 14, height = 4, units = "in")
 }
 
-site_loe_plotter_out <- purrr::map(my_input_test_sites, 
+site_loe_plotter_out <- purrr::map(my_input_sites, 
                                    ~site_loe_plotter(.x, file.path(output_base_dir, .x))
 )
 
