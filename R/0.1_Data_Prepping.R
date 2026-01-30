@@ -1,4 +1,4 @@
-# This function is designed to import, clean, and assemble site/sample data for Rapid Screening Causual Assessment.
+# This function is designed to import, clean, and assemble site/sample data for Rapid Screening causal Assessment.
 # This function creates final CSCI, Stressor, and Site/OE datasets and saves them locally as R Data files.
 # Re-run this function to re-pull/re-fresh base datasets.
 # Those datasets will be used and subsetted to create Comparator and Test Site datasets.
@@ -88,7 +88,7 @@ prep_smc_data <- function(con) {
     mutate(sampledate=as.Date(sampledate)) %>% 
     inner_join(lustations_df %>% select(masterid,stationid), by = c("stationcode" = "stationid")) %>% #get masterid
     # create field that is T/F based on meeting conditions of a suitable sample
-    # recent update: remove this data checking step, so that these sites can still pass through causual assessment
+    # recent update: remove this data checking step, so that these sites can still pass through causal assessment
     # mutate(suitable_sample = ifelse(count >= 250 & pcnt_ambiguous_taxa <= 50 & pcnt_ambiguous_individuals <= 50, TRUE, FALSE)) %>% 
     # only retain suitable samples based on those criteria
     # filter(suitable_sample == TRUE) %>% 
@@ -689,7 +689,7 @@ prep_smc_data <- function(con) {
   # resave(stressor_csci_base_df, file = "Base_Files/Base_Data.RData")
   #### FINAL OE DATASET ####
   
-  # get otu/captur prob data, add MaxOfCSCI scores (by masterid)
+  # get otu/capture prob data, add MaxOfCSCI scores (by masterid)
   
   oe_base_df <- oe_clean 
   
