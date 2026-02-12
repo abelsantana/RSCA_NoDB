@@ -32,6 +32,7 @@
 # 4) Create final merged datasets, export for use in following scripts.
 
 
+
 prep_smc_data <- function(con) {
   
   #### LOADING LIBRARIES, CONNECTING TO DATABASE ####
@@ -538,7 +539,7 @@ prep_smc_data <- function(con) {
     left_join(csci_samples, by = c("masterid", "sampledate")) %>% 
     filter(csci_check == 1) %>% 
     select(masterid, sampledate, variable, result, unit) %>% 
-    filter(variable %in% c("XCMG", "PCT_SAFN", "H_SubNat", "H_AqHab", "Ev_FlowHab")) %>% 
+    filter(variable %in% c("XCDENMID", "PCT_SAFN", "H_SubNat", "H_AqHab", "Ev_FlowHab")) %>% 
     rename(analytename = variable) %>% 
     mutate(fieldreplicate = 1,
            labreplicate = "",
@@ -639,7 +640,7 @@ prep_smc_data <- function(con) {
                             analytename == "Chlorophyll a" ~ "ug/cm2",
                             analytename == "Temperature" ~ "deg C",
                             analytename %in% c('Ev_FlowHab', 'H_AqHab', 'H_SubNat') ~"none",
-                            analytename %in% c('PCT_SAFN', 'XCMG') ~ "%")) %>% 
+                            analytename %in% c('PCT_SAFN', 'XCDENMID') ~ "%")) %>% 
     # making an outlier note, values based on Rafi's recommendation
     mutate(outlier = case_when(analytename == "Temperature" & result > 40 ~ "yes",
                                analytename == "Dissolved Oxygen" & result > 20 ~ "yes",
@@ -684,7 +685,7 @@ prep_smc_data <- function(con) {
                             analytename == "Chlorophyll a" ~ "ug/cm2",
                             analytename == "Temperature" ~ "deg C",
                             analytename %in% c('Ev_FlowHab', 'H_AqHab', 'H_SubNat') ~ "none",
-                            analytename %in% c('PCT_SAFN', 'XCMG') ~ "%")) 
+                            analytename %in% c('PCT_SAFN', 'XCDENMID') ~ "%")) 
   
   # resave(stressor_csci_base_df, file = "Base_Files/Base_Data.RData")
   #### FINAL OE DATASET ####
@@ -702,9 +703,18 @@ prep_smc_data <- function(con) {
                 distinct(masterid,latitude,longitude,county,.keep_all = TRUE))
   
   # resave(station_base_df, file = "Base_Files/Base_Data.RData")
+
+  #### SCAPE DATA - Stream Constraints ####
+  # NOTE: This data is moved here from R/0.2_RSCA_Core.R to eliminate database calls during the main analysis workflow.
+  # The SCAPE (Stream Constraints) data is queried here and saved with the base data for offline use.
+  
+  scape_base_df <- tbl(con, sql("SELECT * FROM sde.scape_strm_constraints")) %>% 
+    as_tibble() %>%
+    # Convert all -999 values to NA
+    mutate(across(where(is.numeric), ~ ifelse(.x <= 0, NA, .x)))
   
   ### added Dec 2023 after updating packages, "resave" was not working in the function
-  save(csci_base_df, stressor_csci_base_df, oe_base_df, station_base_df, chansum_df, file = "Base_Files/Base_Data.RData")
+  save(csci_base_df, stressor_csci_base_df, oe_base_df, station_base_df, chansum_df, scape_base_df, file = "Base_Files/Base_Data.RData")
   
   #### DATABASE DISCONNECTION ####
   

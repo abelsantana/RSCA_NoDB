@@ -26,7 +26,7 @@ Dat_invt_fun <- function(LOEInputData){
     mutate(module = case_when(analytename %in% c("Chloride", "SpecificConductivity", "Sulfate", "Total Dissolved Solids") ~ "Conductivity",
                               analytename %in% c("AFDM_Algae", "Chlorophyll a", "Dissolved Oxygen", "Nitrogen,Total","Phosphorus as P") ~ "Eutrophication",
                               analytename %in% c("Ev_FlowHab", "H_AqHab", "H_SubNat", "PCT_SAFN") ~ "Habitat",
-                              analytename %in% c("Temperature", "XCMG") ~ "Temperature")) %>% 
+                              analytename %in% c("Temperature", "XCDENMID") ~ "Temperature")) %>% 
     # finally, count number of test samples per module (not including NA data)
     group_by(test_site, module) %>% 
     mutate(n_test_samples_module = sum(n_test_samples)) %>% 

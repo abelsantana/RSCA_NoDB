@@ -38,16 +38,19 @@ load("Base_Files/Base_Data.RData")
 load("Base_Files/RSCA_Module_Direction_Assignments.RData")
 
 # also import scape data
-# from SMC database connection, information not posted on github
+# NOTE: SCAPE data is now queried and saved in R/0.1_Data_Prepping.R to eliminate database calls during the main analysis.
+# The scape_base_df is loaded above from Base_Data.RData, so no database connection is needed here.
+# This change decouples the main workflow from the database, allowing for offline analysis.
 
-
-scape <- tbl(con, sql("SELECT * FROM sde.scape_strm_constraints")) %>% 
-  as_tibble()
+# OLD CODE (commented out - database call moved to 0.1_Data_Prepping.R):
+# scape <- tbl(con, sql("SELECT * FROM sde.scape_strm_constraints")) %>% 
+#   as_tibble()
 # scape <- read_csv("Data/scape_strm_constraints.csv")
 
-# TODO Convert all -999 values to NA
-scape <- scape %>% 
-  mutate(across(where(is.numeric), ~ ifelse(.x <= 0, NA, .x)))
+# NEW CODE - load from Base_Data.RData:
+scape <- scape_base_df
+
+# TODO Convert all -999 values to NA (already done in 0.1_Data_Prepping.R)
 
 
 #TestID <- "SMC01004"

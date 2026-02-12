@@ -22,6 +22,8 @@ library(tidyverse)
 library(lubridate)
 library(ggpubr)
 
+year_breaks <- 2000:2025
+
 site_csci_module_plotter <- function(my_site, output_dir) {
   if (!dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
@@ -58,9 +60,9 @@ site_csci_module_plotter <- function(my_site, output_dir) {
     geom_hline(yintercept = 0.79, linetype = "dashed", size = 0.5, show.legend = TRUE)+
     
     # setting Expected data range, will change if add new data
-    # date range is geneally 2000-2019
+    # date range is generally 2000-2019
     # will later want to make date range not manually set
-    scale_x_discrete(limits = c(2000:2025))+
+    scale_x_continuous(breaks = year_breaks, limits = c(2000, 2025)) +
     # setting csci breaks and limits
     scale_y_continuous(limits = c(0, 1.2), breaks = c(0, 0.4, 0.8, 1.2))+
     expand_limits(x = c(2000, 2025))+
@@ -72,7 +74,8 @@ site_csci_module_plotter <- function(my_site, output_dir) {
                                                                c("Over Scoring", "Expected", "Under Scoring", 'Indeterminate')))+
     ylab("CSCI Score")+
     theme_pubr(legend = 'right')+
-    theme(axis.title.x = element_blank())
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+    theme(axis.title.x = element_text())
   
   # want long format for module results
   # to deal with replicates: only display results for max csci score per sampledate
@@ -103,7 +106,7 @@ site_csci_module_plotter <- function(my_site, output_dir) {
     geom_tile(aes(fill = Result), color = 'white', width = 0.8, height = 0.8, show.legend = TRUE)+
     # setting expected data range, will change if add new data
     # date range
-    scale_x_discrete(limits = c(2000:2025))+
+    scale_x_continuous(breaks = year_breaks, limits = c(2000, 2025)) +
     expand_limits(x = c(2000, 2025))+
     # using colorblind friendly palette instead, with matched module results set above in cbPalette
     scale_fill_manual(values = cbPalette, limits = names(cbPalette))+
@@ -112,10 +115,11 @@ site_csci_module_plotter <- function(my_site, output_dir) {
     xlab("Year")+
     labs(fill = "Module Summary")+
     theme_pubr(legend = 'right')+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
     # manually set legend sizes so consistent across all plots
     # theme(legend.title = element_text(size = 20),
     #       legend.text = element_text(size = 16))+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_text())
   
   combined_plot <- ggarrange(site_csci_plot, site_module_plot,
                              nrow = 2,
@@ -186,7 +190,7 @@ site_loe_plotter <- function(my_site, output_dir) {
            aes(x = year, y = LOE))+
       geom_tile(aes(fill = Score), color = 'white', width = 0.8, height = 0.8, show.legend = TRUE)+
       # setting expected data range, will change if add new data
-      scale_x_discrete(limits = c(2000:2025))+
+      scale_x_continuous(breaks = year_breaks, limits = c(2000, 2025)) +
       expand_limits(x = c(2000, 2025))+
       # using colorblind friendly palette instead, with matched module results set above in cbPalette
       scale_fill_manual(values = cbPalette_v2, limits = names(cbPalette_v2), drop = FALSE)+
@@ -198,8 +202,9 @@ site_loe_plotter <- function(my_site, output_dir) {
       # theme(legend.title = element_text(size = 20),
       #       legend.text = element_text(size = 16))+
       theme_pubr(legend = 'right')+
-      # no longer want axis label for yeae
-      theme(axis.title.x = element_blank())
+      theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+      # no longer want axis label for year
+      theme(axis.title.x = element_text())
   }
   
   # iterate function across list of modules, per site
