@@ -14,3 +14,5 @@ R/troubleshooting.R
 comparator_sites_all.RData
 comparator_sites_all.rds
 unique_comparator_sites.RData
+troubleshooting/output/
+troubleshooting/logs/
