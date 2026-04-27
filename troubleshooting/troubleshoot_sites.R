@@ -11,9 +11,11 @@ suppressPackageStartupMessages({
 
 options(dplyr.summarise.inform = FALSE)
 
-target_file <- "troubleshooting/input/target_sites.csv"
-output_dir <- "troubleshooting/output"
-log_dir <- "troubleshooting/logs"
+target_file <- Sys.getenv("RSCA_TROUBLESHOOT_TARGET_FILE", "troubleshooting/input/target_sites.csv")
+output_dir <- Sys.getenv("RSCA_TROUBLESHOOT_OUTPUT_DIR", "troubleshooting/output")
+log_dir <- Sys.getenv("RSCA_TROUBLESHOOT_LOG_DIR", "troubleshooting/logs")
+base_data_path <- Sys.getenv("RSCA_BASE_DATA_PATH", "Base_Files/Base_Data.RData")
+module_assignments_path <- Sys.getenv("RSCA_MODULE_ASSIGNMENTS_PATH", "Base_Files/RSCA_Module_Direction_Assignments.RData")
 
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(log_dir, recursive = TRUE, showWarnings = FALSE)
@@ -26,8 +28,8 @@ target_year_chr <- as.character(target_year)
 Type <- NA
 import_sites <- tibble(masterid = target_sites)
 
-load("Base_Files/Base_Data.RData")
-load("Base_Files/RSCA_Module_Direction_Assignments.RData")
+load(base_data_path)
+load(module_assignments_path)
 
 # The source workflow expects a scape object from the database. This diagnostic
 # runs from saved RData only; default CSCI thresholding uses 0.79, so these
