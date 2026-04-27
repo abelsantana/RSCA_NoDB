@@ -74,5 +74,6 @@
         "ungroup",
         "unitname",
         "XCMG"
-    ]
+    ],
+    "chatgpt.openOnStartup": true
 }
